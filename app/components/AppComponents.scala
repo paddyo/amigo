@@ -85,9 +85,6 @@ class AppComponents(context: Context)
   }
   val bakeScheduler = new BakeScheduler(scheduledBakeRunner)
 
-  Logger.info("Registering all scheduled bakes with the scheduler")
-  bakeScheduler.initialise(Recipes.list())
-
   val rootController = new RootController(googleAuthConfig)
   val baseImageController = new BaseImageController(googleAuthConfig, messagesApi)
   val roleController = new RoleController(googleAuthConfig)
