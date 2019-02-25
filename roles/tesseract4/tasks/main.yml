@@ -12,22 +12,7 @@
     name: tesseract-ocr
     update_cache: yes
 
-- name: Install Tesseract Arabic
+- name: Install Tesseract Language Packages
   apt:
-    name: tesseract-ocr-ara
-    update_cache: yes
-
-- name: Install Tesseract French
-  apt:
-    name: tesseract-ocr-fra
-    update_cache: yes
-
-- name: Install Tesseract German
-  apt:
-    name: tesseract-ocr-deu
-    update_cache: yes
-
-- name: Install Tesseract Russian
-  apt:
-    name: tesseract-ocr-rus
+    name: tesseract-lang
     update_cache: yes
