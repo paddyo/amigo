@@ -18,7 +18,6 @@ import com.gu.googleauth.GoogleAuthConfig
 import controllers._
 import data.{ Dynamo, Recipes }
 import event.{ ActorSystemWrapper, BakeEvent, Behaviours }
-import housekeeping.{ BakeDeletion, HousekeepingScheduler, MarkOldUnusedBakesForDeletion, MarkOrphanedBakesForDeletion }
 import notification.{ AmiCreatedNotifier, LambdaDistributionBucket, NotificationSender, SNS }
 import org.joda.time.Duration
 import org.quartz.Scheduler
@@ -33,7 +32,7 @@ import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.routing.Router
 import prism.Prism
 import router.Routes
-import schedule.{ BakeScheduler, ScheduledBakeRunner }
+import schedule._
 import services.{ ElkLogging, Loggable, PrismAgents }
 
 import scala.concurrent.Await

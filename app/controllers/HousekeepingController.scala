@@ -2,9 +2,9 @@ package controllers
 
 import com.gu.googleauth.GoogleAuthConfig
 import data._
-import housekeeping.MarkOrphanedBakesForDeletion
 import models.BakeId
 import play.api.mvc._
+import schedule.MarkOrphanedBakesForDeletion
 import services.Loggable
 
 class HousekeepingController(val authConfig: GoogleAuthConfig)(implicit dynamo: Dynamo)

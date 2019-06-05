@@ -1,5 +1,6 @@
-package housekeeping
+package schedule
 
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest
 import data.{ Bakes, Dynamo, Recipes }
 import models.{ Bake, BakeId, RecipeId }
 import org.quartz.SimpleScheduleBuilder
@@ -19,10 +20,10 @@ object MarkOrphanedBakesForDeletion {
   }
 }
 
-class MarkOrphanedBakesForDeletion(prismAgents: PrismAgents, dynamo: Dynamo) extends HousekeepingJob with Loggable {
+class MarkOrphanedBakesForDeletion(prismAgents: PrismAgents, dynamo: Dynamo) extends ScheduledJob with Loggable {
   override val schedule = SimpleScheduleBuilder.repeatHourlyForever(24)
 
-  override def housekeep(): Unit = {
+  override def scheduleAction(): Unit = {
     implicit val implicitPrismAgents: PrismAgents = prismAgents
     implicit val implicitDynamo: Dynamo = dynamo
     val (errors, recipes) = Recipes.recipesWithErrors

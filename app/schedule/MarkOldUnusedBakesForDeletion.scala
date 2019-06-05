@@ -1,4 +1,4 @@
-package housekeeping
+package schedule
 
 import data.{ Bakes, Dynamo, Recipes }
 import models.{ Bake, RecipeId }
@@ -29,10 +29,10 @@ object MarkOldUnusedBakesForDeletion {
   }
 }
 
-class MarkOldUnusedBakesForDeletion(prismAgents: PrismAgents, dynamo: Dynamo) extends HousekeepingJob with Loggable {
+class MarkOldUnusedBakesForDeletion(prismAgents: PrismAgents, dynamo: Dynamo) extends ScheduledJob with Loggable {
   override val schedule = SimpleScheduleBuilder.repeatHourlyForever(1)
 
-  override def housekeep(): Unit = {
+  override def scheduleAction(): Unit = {
     implicit val implicitPrismAgents: PrismAgents = prismAgents
     implicit val implicitDynamo: Dynamo = dynamo
     log.info(s"Started marking old, unused bakes for deletion")

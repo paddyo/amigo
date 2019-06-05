@@ -23,7 +23,7 @@ class ScheduledBakeRunner(enabled: Boolean, prism: PrismAgents, eventBus: EventB
                 val theBake = Bakes.create(recipe, buildNumber, startedBy = "scheduler")
 
                 log.info(s"Starting scheduled bake: ${theBake.bakeId}")
-                PackerRunner.createImage(theBake, prism, eventBus, ansibleVars, false)
+                PackerRunner.createImage(theBake, prism, eventBus, ansibleVars, debug = false, queue = true)
               case None =>
                 log.warn(s"Failed to get the next build number for recipe $recipeId")
             }

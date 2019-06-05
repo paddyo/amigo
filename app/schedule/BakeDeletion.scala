@@ -1,5 +1,6 @@
-package housekeeping
+package schedule
 
+import com.amazonaws.services.ec2.model.{ DescribeInstancesRequest, Filter }
 import data.{ BakeLogs, Bakes, Dynamo }
 import models.BakeId
 import notification.NotificationSender
@@ -13,14 +14,14 @@ import services.{ Loggable, PrismAgents }
 class BakeDeletion(dynamo: Dynamo,
     amigoAwsAccount: String,
     prismAgents: PrismAgents,
-    notificationSender: NotificationSender) extends HousekeepingJob with Loggable {
+    notificationSender: NotificationSender) extends ScheduledJob with Loggable {
 
   implicit private val implDynamo: Dynamo = dynamo
   implicit private val implPrismAgents: PrismAgents = prismAgents
 
   override val schedule = SimpleScheduleBuilder.repeatMinutelyForever(1)
 
-  def housekeep(): Unit = {
+  def scheduleAction(): Unit = {
     log.info(s"Started bake deletion housekeeping")
 
     // get some bakes that have been deleted
@@ -32,6 +33,8 @@ class BakeDeletion(dynamo: Dynamo,
     val amis = deletedBakes.flatMap(_.amiId)
     val allAmis = RecipeUsage.allAmis(amis, amigoAwsAccount)
     notificationSender.sendHousekeepingTopicMessage(allAmis)
+
+    new DescribeInstancesRequest().withFilters(new Filter())
 
     // delete the logs and bakes
     deletedBakes.foreach { bake =>

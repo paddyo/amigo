@@ -1,8 +1,8 @@
-package housekeeping
+package schedule
 
-import org.quartz._
+import org.quartz.{JobKey, ScheduleBuilder, Trigger, TriggerKey}
 
-trait HousekeepingJob {
+trait ScheduledJob {
   val schedule: ScheduleBuilder[_ <: Trigger]
 
   val name: String = getClass.getName
@@ -10,5 +10,5 @@ trait HousekeepingJob {
   val jobKey = new JobKey(name)
   val triggerKey = new TriggerKey(name)
 
-  def housekeep(): Unit
+  def scheduleAction(): Unit
 }

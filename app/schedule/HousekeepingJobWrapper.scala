@@ -1,4 +1,4 @@
-package housekeeping
+package schedule
 
 import org.quartz.{ DisallowConcurrentExecution, Job, JobDataMap, JobExecutionContext }
 
@@ -11,9 +11,9 @@ class HousekeepingJobWrapper extends Job {
   override def execute(context: JobExecutionContext): Unit = {
     implicit val jobDataMap: JobDataMap = context.getJobDetail.getJobDataMap
 
-    val housekeepingJob = getAs[HousekeepingJob](HousekeepingScheduler.HousekeepingJobInstance)
+    val housekeepingJob = getAs[ScheduledJob](HousekeepingScheduler.HousekeepingJobInstance)
 
-    housekeepingJob.housekeep()
+    housekeepingJob.scheduleAction()
   }
 
 }
