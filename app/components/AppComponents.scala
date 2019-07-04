@@ -9,6 +9,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.retry.{ PredefinedRetryPolicies, RetryPolicy }
 import com.amazonaws.retry.PredefinedRetryPolicies.SDKDefaultRetryCondition
 import com.amazonaws.services.dynamodbv2.{ AmazonDynamoDB, AmazonDynamoDBClient }
+import com.amazonaws.services.ec2.{ AmazonEC2, AmazonEC2ClientBuilder }
 import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
 import com.amazonaws.services.securitytoken.{ AWSSecurityTokenService, AWSSecurityTokenServiceClientBuilder }
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
@@ -23,7 +24,7 @@ import org.joda.time.Duration
 import org.quartz.Scheduler
 import org.quartz.impl.StdSchedulerFactory
 import packer.PackerConfig
-import play.api.{ BuiltInComponentsFromContext, Configuration, Logger }
+import play.api.{ BuiltInComponentsFromContext, Configuration }
 import play.api.ApplicationLoader.Context
 import play.api.i18n.I18nComponents
 import play.api.libs.iteratee.Concurrent
@@ -111,6 +112,12 @@ class AppComponents(context: Context)
     amigoAwsAccount
   }
 
+  val ec2Client: AmazonEC2 = AmazonEC2ClientBuilder.standard
+    .withCredentials(awsCreds)
+    .withRegion(region)
+    .withClientConfiguration(clientConfiguration)
+    .build()
+
   val prism = new Prism(wsClient)
   val prismAgents = new PrismAgents(prism, applicationLifecycle, actorSystem.scheduler, environment)
 
@@ -181,11 +188,14 @@ class AppComponents(context: Context)
   log.info("Registering all scheduled bakes with the scheduler")
   bakeScheduler.initialise(Recipes.list())
 
-  val bakeDeletionHousekeeping = new BakeDeletion(dynamo, awsAccount, prismAgents, sender)
-  val markOldUnusedBakesForDeletion = new MarkOldUnusedBakesForDeletion(prismAgents, dynamo)
-  val markOrphanedBakesForDeletion = new MarkOrphanedBakesForDeletion(prismAgents, dynamo)
+  val houseKeepingJobs = List(
+    new BakeDeletion(dynamo, awsAccount, prismAgents, sender),
+    new MarkOldUnusedBakesForDeletion(prismAgents, dynamo),
+    new MarkOrphanedBakesForDeletion(prismAgents, dynamo),
+    TimeOutLongRunningBakes(identity.stage, ec2Client)
+  )
 
-  val housekeepingScheduler = new HousekeepingScheduler(scheduler, List(bakeDeletionHousekeeping, markOldUnusedBakesForDeletion, markOrphanedBakesForDeletion))
+  val housekeepingScheduler = new HousekeepingScheduler(scheduler, houseKeepingJobs)
   housekeepingScheduler.initialise()
 
   val debugAvailable = identity.stage != "PROD"

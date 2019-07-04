@@ -1,4 +1,4 @@
-package housekeeping
+package schedule
 
 import models._
 import org.joda.time.{ DateTime, DateTimeZone }
