@@ -36,3 +36,8 @@
   apt:
     name: tesseract-ocr-por
     update_cache: yes
+    
+- name: Install Tesseract Maltese
+  apt:
+    name: tesseract-ocr-mlt
+    update_cache: yes
